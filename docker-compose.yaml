@@ -1,0 +1,261 @@
+name: dashverse
+
+x-superset-env: &superset-env
+  DATABASE_DIALECT: postgresql
+  DATABASE_HOST: postgresql
+  DATABASE_PORT: 5432
+  DATABASE_DB: ${POSTGRES_DB}
+  DATABASE_USER: ${POSTGRES_USER}
+  DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+  SUPERSET_LOAD_EXAMPLES: "no"
+  PYTHONPATH: /app/pythonpath
+  SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+
+services:
+  postgresql:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/sql/schema:/docker-entrypoint-initdb.d:ro
+      - ./compose/sync/sync.sh:/scripts/sync.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.everse-sync.schedule: "0 0 2 * * *"
+      ofelia.job-exec.everse-sync.command: >-
+        sh -c "DB_HOST=localhost DB_NAME=${POSTGRES_DB} DB_USER=${POSTGRES_USER}
+        DB_PASSWORD=${POSTGRES_PASSWORD} sh /scripts/sync.sh"
+
+  postgrest:
+    image: postgrest/postgrest:v12.2.3
+    restart: unless-stopped
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: web_anon
+      PGRST_SERVER_PORT: 3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_JWT_ROLE_CLAIM_KEY: .role
+    ports:
+      - "3000:3000"
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  superset-init:
+    image: apache/superset:4.1.1
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      <<: *superset-env
+      ADMIN_USERNAME: admin
+      ADMIN_EMAIL: admin@dashverse.local
+      ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+    volumes:
+      - ./compose/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./compose/superset/bootstrap.sh:/app/bootstrap.sh:ro
+    user: root
+    entrypoint: ["/bin/bash", "/app/bootstrap.sh"]
+    restart: "no"
+
+  superset:
+    image: apache/superset:4.1.1
+    restart: unless-stopped
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    environment:
+      <<: *superset-env
+    volumes:
+      - ./compose/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+    ports:
+      - "8088:8088"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        pip install --quiet psycopg2-binary flask-cors &&
+        /usr/bin/run-server.sh
+
+  superset-worker:
+    image: apache/superset:4.1.1
+    restart: unless-stopped
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    environment:
+      <<: *superset-env
+    volumes:
+      - ./compose/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+    command:
+      - /bin/sh
+      - -c
+      - |
+        pip install --quiet psycopg2-binary flask-cors &&
+        celery --app=superset.tasks.celery_app:app worker --concurrency=4
+
+  superset-beat:
+    image: apache/superset:4.1.1
+    restart: unless-stopped
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    environment:
+      <<: *superset-env
+    volumes:
+      - ./compose/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+    command:
+      - /bin/sh
+      - -c
+      - |
+        pip install --quiet psycopg2-binary flask-cors &&
+        celery --app=superset.tasks.celery_app:app beat --pidfile /tmp/celerybeat.pid
+
+  auth-service:
+    build: ./auth-service
+    image: dashverse/auth-service:latest
+    restart: unless-stopped
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: HS256
+      JWT_EXPIRATION_DAYS: 7
+      PASSWORD_MIN_LENGTH: 12
+      MAX_LOGIN_ATTEMPTS: 5
+      LOCKOUT_DURATION_MINUTES: 15
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+
+  demo-portal:
+    build: ./demo-portal
+    image: dashverse/demo-portal:latest
+    restart: unless-stopped
+    depends_on:
+      - superset
+    environment:
+      SUPERSET_URL: http://superset:8088
+      SUPERSET_EXTERNAL_URL: ${SUPERSET_EXTERNAL_URL:-http://localhost:8088}
+      LOG_LEVEL: INFO
+    ports:
+      - "8080:8080"
+
+  postgrest-docs-init:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      - postgrest
+    volumes:
+      - postgrest_docs:/docs
+    command:
+      - sh
+      - -c
+      - |
+        until curl -sf http://postgrest:3000/ -o /docs/openapi.json; do
+          echo "Waiting for postgrest..."; sleep 5;
+        done
+    restart: "no"
+
+  postgrest-docs:
+    image: scalarapi/api-reference:latest
+    restart: unless-stopped
+    depends_on:
+      postgrest-docs-init:
+        condition: service_completed_successfully
+    environment:
+      API_REFERENCE_CONFIG: '{"theme":"purple","spec":{"url":"/openapi.json"}}'
+    volumes:
+      - postgrest_docs:/usr/share/nginx/html/docs:ro
+    ports:
+      - "3001:8080"
+
+  auth-docs-init:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      - auth-service
+    volumes:
+      - auth_docs:/docs
+    command:
+      - sh
+      - -c
+      - |
+        until curl -sf http://auth-service:8000/openapi.json -o /docs/openapi.json; do
+          echo "Waiting for auth-service..."; sleep 5;
+        done
+    restart: "no"
+
+  auth-docs:
+    image: scalarapi/api-reference:latest
+    restart: unless-stopped
+    depends_on:
+      auth-docs-init:
+        condition: service_completed_successfully
+    environment:
+      API_REFERENCE_CONFIG: '{"theme":"blue","spec":{"url":"/openapi.json"}}'
+    volumes:
+      - auth_docs:/usr/share/nginx/html/docs:ro
+    ports:
+      - "8001:8080"
+
+  ofelia:
+    image: mcuadros/ofelia:v0.3.16
+    restart: unless-stopped
+    depends_on:
+      - postgresql
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  setup-dashboards:
+    profiles: ["setup"]
+    image: python:3.12-slim
+    depends_on:
+      - superset
+    environment:
+      SUPERSET_URL: http://superset:8088
+      SUPERSET_USERNAME: admin
+      SUPERSET_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      DATABASE_HOST: postgresql
+      DATABASE_PORT: 5432
+      DATABASE_DB: ${POSTGRES_DB}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_SCHEMA: api
+    volumes:
+      - ./compose/superset:/app:ro
+    working_dir: /app
+    command:
+      - /bin/sh
+      - -c
+      - |
+        pip install --quiet -r requirements.txt &&
+        python setup_dashboards.py
+
+volumes:
+  postgres_data:
+  redis_data:
+  postgrest_docs:
+  auth_docs:
