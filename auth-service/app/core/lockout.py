@@ -45,7 +45,6 @@ def is_account_locked(db: Session, username: str) -> tuple[bool, Optional[dateti
     if not latest_attempt or not latest_attempt.locked_until:
         return False, None
 
-    # quick fix - check if lock is still active
     if latest_attempt.locked_until > datetime.utcnow():
         return True, latest_attempt.locked_until
 
