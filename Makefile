@@ -17,7 +17,15 @@ status:
 	kubectl get all -n $(NS)
 
 port-forward:
-	./scripts/port-forward.sh
+	@trap 'kill 0' INT TERM; \
+	kubectl port-forward -n $(NS) svc/postgresql 5432:5432 & \
+	kubectl port-forward -n $(NS) svc/postgrest 3000:3000 & \
+	kubectl port-forward -n $(NS) svc/superset 8088:8088 & \
+	kubectl port-forward -n $(NS) svc/auth-service 8000:8000 & \
+	kubectl port-forward -n $(NS) svc/demo-portal 8080:8080 & \
+	kubectl port-forward -n $(NS) svc/postgrest-docs 3001:3001 & \
+	kubectl port-forward -n $(NS) svc/auth-docs 8001:8001 & \
+	wait
 
 logs:
 	kubectl logs -n $(NS) -l app=dashverse --all-containers -f
