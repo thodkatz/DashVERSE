@@ -10,6 +10,9 @@ deploy: build-auth build-demo
 destroy:
 	cd terraform && tofu destroy -var-file="environments/$(ENV).tfvars" -auto-approve
 
+destroy-all: destroy
+	minikube delete --all
+
 status:
 	kubectl get all -n $(NS)
 
