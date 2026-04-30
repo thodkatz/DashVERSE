@@ -5,30 +5,62 @@ and deploying the full DashVERSE stack (Terraform + Kubernetes + Ansible) inside
 
 ## Overview
 
-```
-Manjaro workstation  ──SSH tunnel──►  NixOS server  ──NAT──►  Ubuntu VM
-  browser:8088                         (hypervisor)              (DashVERSE)
-```
 
 The VM runs Minikube (docker driver), OpenTofu, and Ansible.
-Everything is accessed from the workstation browser via an SSH jump tunnel.
 
 ---
 
 ## Phase 1 — NixOS: enable the hypervisor
 
-Add the snippet in [scripts/vm/nixos-hypervisor.nix](../scripts/vm/nixos-hypervisor.nix)
-to your `/etc/nixos/configuration.nix`, replacing `<youruser>` with your username:
+Add the following to your `/etc/nixos/configuration.nix`, replacing `<youruser>` with your username.
+
+> **Note:** `virt-manager` (not `virt-install`) is the correct nixpkgs attribute — it provides the `virt-install` CLI. `cloud-utils` provides `cloud-localds`. libvirt on NixOS cannot create bridge interfaces at runtime, so the bridge, NAT, and DHCP must all be declared in NixOS and managed by the system — not by libvirt.
 
 ```nix
+# KVM / libvirt
 virtualisation.libvirtd.enable = true;
 virtualisation.libvirtd.allowedBridges = [ "virbr0" ];
-users.users.<youruser>.extraGroups = [ "libvirtd" "kvm" ];
+
+# Tools
 environment.systemPackages = with pkgs; [
-  virt-install
-  cloud-image-utils
-  qemu-utils
+  virt-manager   # provides virt-install CLI
+  cloud-utils    # provides cloud-localds
+  qemu-utils     # provides qemu-img
 ];
+
+# Add your user to the libvirtd and kvm groups
+users.users.<youruser>.extraGroups = [ "libvirtd" "kvm" ];
+
+# NixOS-managed bridge — libvirt attaches VMs to it but does not own it
+networking.bridges.virbr0.interfaces = [];
+networking.interfaces.virbr0.ipv4.addresses = [{
+  address = "192.168.122.1";
+  prefixLength = 24;
+}];
+
+# Tell NetworkManager to leave libvirt interfaces alone
+networking.networkmanager.unmanaged = [ "interface-name:virbr0" "interface-name:vnet*" ];
+
+# IP forwarding for VM outbound traffic
+boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
+
+# NAT so VMs can reach the internet
+networking.nat = {
+  enable = true;
+  internalInterfaces = [ "virbr0" ];
+};
+
+# DHCP for VMs on the bridge
+services.dnsmasq = {
+  enable = true;
+  settings = {
+    interface = "virbr0";
+    bind-interfaces = true;
+    dhcp-range = "192.168.122.2,192.168.122.254,24h";
+  };
+};
+
+# Allow bridge traffic through the firewall
 networking.firewall.trustedInterfaces = [ "virbr0" ];
 ```
 
@@ -36,7 +68,7 @@ Apply and re-login:
 
 ```sh
 sudo nixos-rebuild switch
-# log out and back in so group membership takes effect
+# log out and back in so group membership (libvirtd, kvm) takes effect
 ```
 
 ---
@@ -63,10 +95,10 @@ bash scripts/vm/create-vm.sh
 | `VM_USER` | `dashverse` | Guest OS username |
 | `IMAGE_DIR` | `/var/lib/libvirt/images` | Image storage path |
 
-The script prints the VM IP when the DHCP lease appears. If it times out, check:
+The script prints the VM IP when the DHCP lease appears. If it times out, check the dnsmasq leases file (DHCP is managed by NixOS, not libvirt):
 
 ```sh
-sudo virsh net-dhcp-leases default
+cat /var/lib/dnsmasq/dnsmasq.leases
 ```
 
 Cloud-init runs on first boot and may take ~30 seconds after the lease appears.
@@ -79,8 +111,8 @@ ssh dashverse@<VM_IP>   # should succeed before moving on
 ### VM lifecycle commands
 
 ```sh
-# list all VMs
-sudo virsh list --all
+# list all VMs (requires system URI)
+virsh -c qemu:///system list --all
 
 # start / stop / delete
 sudo virsh start dashverse-test
@@ -95,10 +127,12 @@ sudo virsh undefine dashverse-test --remove-all-storage
 
 Copy and run [scripts/vm/setup-vm.sh](../scripts/vm/setup-vm.sh) **inside the VM**.
 
+
 ```sh
 # from the hypervisor host (or Manjaro via jump):
-scp scripts/vm/setup-vm.sh dashverse@<VM_IP>:~/
-ssh dashverse@<VM_IP> 'bash setup-vm.sh'
+ssh dashverse@<VM_IP>
+git clone https://github.com/thodkatz/DashVERSE.git
+bash DashVERSE/scripts/vm/setup-vm.sh
 ```
 
 This installs:
@@ -124,11 +158,9 @@ ssh dashverse@<VM_IP>
 
 ## Phase 4 — Deploy DashVERSE
 
-Clone the repo inside the VM and run [scripts/vm/deploy-dashverse.sh](../scripts/vm/deploy-dashverse.sh):
 
 ```sh
-# inside the VM:
-git clone https://github.com/EVERSE-ResearchSoftware/DashVERSE.git
+# inside the VM
 bash DashVERSE/scripts/vm/deploy-dashverse.sh
 ```
 
@@ -210,7 +242,7 @@ Then open http://localhost:8088 in your local browser.
 To get the VM IP from the NixOS server:
 
 ```sh
-sudo virsh net-dhcp-leases default
+cat /var/lib/dnsmasq/dnsmasq.leases
 ```
 
 ### Retrieve credentials
@@ -264,9 +296,11 @@ make status
 
 ### Find VM IP after reboot
 
+DHCP is managed by NixOS's dnsmasq (not libvirt), so `virsh net-dhcp-leases` will not show anything. Check the dnsmasq leases file instead:
+
 ```sh
 # on the NixOS server:
-sudo virsh net-dhcp-leases default
+cat /var/lib/dnsmasq/dnsmasq.leases
 ```
 
 ### Tear down everything

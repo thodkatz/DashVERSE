@@ -185,14 +185,12 @@ if [[ -z "$VM_IP" ]]; then
     echo "  # or: arp -an | grep 192.168.122"
     echo ""
     echo "Once you have the IP, proceed with:"
-    echo "  scp scripts/vm/setup-vm.sh $VM_USER@<VM_IP>:~/"
     echo "  ssh $VM_USER@<VM_IP> 'bash setup-vm.sh'"
 else
     log "VM is up at: $VM_IP"
     echo ""
     echo "Wait ~30 s for cloud-init to finish, then:"
     echo ""
-    echo "  scp scripts/vm/setup-vm.sh $VM_USER@$VM_IP:~/"
     echo "  ssh $VM_USER@$VM_IP 'bash setup-vm.sh'"
 fi
 echo ""

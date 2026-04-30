@@ -5,8 +5,8 @@ set -euo pipefail
 # fetches software tools and generates sample assessments
 
 NAMESPACE="${1:-dashverse}"
-TECHRADAR_URL="https://api.github.com/repos/EVERSE-ResearchSoftware/TechRadar/contents/data/software-tools"
-RAW_BASE="https://raw.githubusercontent.com/EVERSE-ResearchSoftware/TechRadar/main/data/software-tools"
+TECHRADAR_URL="https://api.github.com/repos/EVERSE-ResearchSoftware/TechRadar/contents/quality-tools"
+RAW_BASE="https://raw.githubusercontent.com/EVERSE-ResearchSoftware/TechRadar/main/quality-tools"
 
 OUTPUT_DIR="/tmp/dashverse-seed"
 mkdir -p "$OUTPUT_DIR"

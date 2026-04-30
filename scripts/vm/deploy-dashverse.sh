@@ -22,7 +22,7 @@ log()   { echo -e "\n${GREEN}==>${NC} $1"; }
 warn()  { echo -e "${YELLOW}  ->${NC} $1"; }
 error() { echo -e "${RED}Error:${NC} $1" >&2; exit 1; }
 
-REPO_URL="${REPO_URL:-https://github.com/EVERSE-ResearchSoftware/DashVERSE.git}"
+REPO_URL="${REPO_URL:-https://github.com/thodkatz/DashVERSE.git}"
 REPO_DIR="${REPO_DIR:-$HOME/DashVERSE}"
 MINIKUBE_CPUS="${MINIKUBE_CPUS:-4}"
 MINIKUBE_MEMORY="${MINIKUBE_MEMORY:-6g}"
@@ -80,7 +80,7 @@ log "Waiting for pods to become ready (up to 10 min)"
 warn "Waiting for Superset pod (this can take 3–5 minutes on first run)..."
 kubectl wait \
     --for=condition=ready pod \
-    --selector=app.kubernetes.io/name=superset \
+    --selector=app=superset \
     --namespace=dashverse \
     --timeout=600s
 
