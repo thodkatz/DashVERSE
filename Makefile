@@ -74,4 +74,5 @@ setup-dashboards:
 		ansible-playbook -i inventory/$(ENV).yml playbooks/configure_superset.yml
 
 seed-data:
-	./scripts/seed-data.sh $(NS) --apply
+	cd ansible && \
+		ansible-playbook -i inventory/$(ENV).yml playbooks/seed_data.yml
