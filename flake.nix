@@ -54,7 +54,7 @@
               echo "=================="
               minikube config set rootless true
               minikube config set driver podman
-              minikube start --cpus='4' --memory='4g' --driver=podman  --container-runtime=containerd
+              minikube start --cpus='4' --memory='8g' --driver=podman  --container-runtime=containerd
             fi
 
             . <(minikube completion bash)

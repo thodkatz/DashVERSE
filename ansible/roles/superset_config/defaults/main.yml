@@ -78,3 +78,12 @@ dashboards:
       Dashboard for trainers designing courses in research software development and quality.
       Highlights common issues, skill gaps, and areas where training can have the most impact.
       See: https://everse.software/RSQKit/trainer
+
+# Per-role include keys (folder names under tasks/everse_roles/).
+# Add a new role by appending its key here and creating everse_roles/<key>/charts.yml and everse_roles/<key>/dashboard.yml.
+dashboard_role_keys:
+  - policy_maker
+  - principal_investigator
+  - research_software_engineer
+  - researcher_who_codes
+  - trainer
