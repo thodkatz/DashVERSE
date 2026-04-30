@@ -1,11 +1,13 @@
 [project]
 name = "dashverse"
 version = "0.1.0"
-description = ""
+description = "Dashboard prototype for the EVERSE project"
 authors = [
-    {name = "Faruk D.",email = "fdiblen@universe.com"}
+    {name = "Faruk D.", email = "f.diblen@esciencecenter.nl"}
 ]
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.13"
 package-mode = false
 dependencies = [
