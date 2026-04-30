@@ -106,7 +106,7 @@ Then open:
 Service credentials are auto-generated during deployment and stored securely in Kubernetes secrets. To retrieve them:
 
 ```shell
-./scripts/show-access.sh
+make show-access
 ```
 
 This displays:

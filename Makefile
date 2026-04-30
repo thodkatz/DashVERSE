@@ -1,4 +1,4 @@
-.PHONY: deploy destroy status port-forward logs logs-auth logs-demo clean sync sync-apply jwt build-auth build-demo setup-dashboards seed-data
+.PHONY: deploy destroy status port-forward logs logs-auth logs-demo clean sync sync-apply jwt build-auth build-demo setup-dashboards seed-data show-access
 
 ENV ?= local
 NS ?= dashverse
@@ -84,3 +84,16 @@ setup-dashboards:
 seed-data:
 	cd ansible && \
 		ansible-playbook -i inventory/$(ENV).yml playbooks/seed_data.yml
+
+show-access:
+	@echo "=== DashVERSE credentials ==="
+	@echo "PostgreSQL:"
+	@echo "  user:     dashverse"
+	@echo "  password: $$(kubectl get secret $(NS)-secrets -n $(NS) -o jsonpath='{.data.postgres-password}' | base64 -d)"
+	@echo "  host:     postgresql.$(NS).svc.cluster.local:5432"
+	@echo "  database: dashverse"
+	@echo ""
+	@echo "Superset:"
+	@echo "  user:     admin"
+	@echo "  password: $$(kubectl get secret $(NS)-secrets -n $(NS) -o jsonpath='{.data.superset-admin-password}' | base64 -d)"
+	@echo "  url:      http://localhost:8088 (via 'make port-forward')"
