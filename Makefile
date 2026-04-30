@@ -56,7 +56,16 @@ sync-trigger:
 	kubectl create job -n $(NS) --from=cronjob/everse-sync everse-sync-manual-$$(date +%s)
 
 jwt:
-	./scripts/generate-jwt.sh $(NS)
+	@if [ -z "$(USERNAME)" ] || [ -z "$(PASSWORD)" ]; then \
+		echo "Usage: make jwt USERNAME=<user> PASSWORD=<pass>"; \
+		echo "       Register a user first via http://localhost:8000/register"; \
+		echo "       Auth-service must be reachable via 'make port-forward'"; \
+		exit 1; \
+	fi
+	@curl -sf -X POST http://localhost:8000/api/auth/login \
+		-H "Content-Type: application/json" \
+		-d '{"username":"$(USERNAME)","password":"$(PASSWORD)"}' \
+		| jq -r .access_token
 
 build-auth:
 ifeq ($(ENV),local)
