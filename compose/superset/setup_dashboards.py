@@ -370,6 +370,10 @@ def link_charts_and_layout() -> None:
             cur.execute(_LAYOUT_SQL)
             cur.execute(_EXPAND_SLICES_SQL)
             cur.execute(_PUBLIC_ROLE_SQL)
+            try:
+                cur.execute(_PUBLIC_ROLE_DATASOURCE_ACCESS_SQL)
+            except Exception as exc:
+                print(f"Warning: failed to grant datasource access to Public role: {exc}")
             cur.execute(_REMOVE_PUBLIC_PERMS_SQL)
         print("Linked charts to dashboards, set layout, granted Public role.")
     finally:
@@ -473,6 +477,19 @@ SELECT nextval('dashboard_roles_id_seq'), r.id, d.id
 FROM ab_role r, dashboards d
 WHERE r.name = 'Public'
   AND d.slug IN ('policy-maker', 'principal-investigator', 'research-software-engineer', 'researcher-who-codes', 'trainer')
+ON CONFLICT DO NOTHING;
+"""
+
+_PUBLIC_ROLE_DATASOURCE_ACCESS_SQL = """
+INSERT INTO ab_permission_view_role (permission_view_id, role_id)
+SELECT pv.id, r.id
+FROM ab_role r
+JOIN ab_permission p ON p.name = 'datasource_access'
+JOIN tables t ON true
+JOIN ab_view_menu vm ON vm.name = t.perm
+JOIN ab_permission_view pv ON pv.permission_id = p.id AND pv.view_menu_id = vm.id
+WHERE r.name = 'Public'
+  AND t.schema = 'api'
 ON CONFLICT DO NOTHING;
 """
 

@@ -38,3 +38,6 @@ backups/
 *.tfstate
 *.tfstate.*
 .tofu/
+
+.codex
+.claude

@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 
+# fall back to POSTGRES_* env vars set inside the postgres container,
+# so `docker compose exec postgresql sh /scripts/sync.sh` works without extra args.
+DB_HOST="${DB_HOST:-localhost}"
+DB_NAME="${DB_NAME:-${POSTGRES_DB}}"
+DB_USER="${DB_USER:-${POSTGRES_USER}}"
+DB_PASSWORD="${DB_PASSWORD:-${POSTGRES_PASSWORD}}"
+
 # install curl and jq if not present (postgres:17-alpine)
 command -v curl >/dev/null 2>&1 || apk add --no-cache curl jq >/dev/null 2>&1
 

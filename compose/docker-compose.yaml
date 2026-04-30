@@ -24,19 +24,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/sql/schema:/docker-entrypoint-initdb.d:ro
-      - ./compose/sync/sync.sh:/scripts/sync.sh:ro
+      - ../database/sql/schema:/docker-entrypoint-initdb.d:ro
+      - ./sync/sync.sh:/scripts/sync.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
-    labels:
-      ofelia.enabled: "true"
-      ofelia.job-exec.everse-sync.schedule: "0 0 2 * * *"
-      ofelia.job-exec.everse-sync.command: >-
-        sh -c "DB_HOST=localhost DB_NAME=${POSTGRES_DB} DB_USER=${POSTGRES_USER}
-        DB_PASSWORD=${POSTGRES_PASSWORD} sh /scripts/sync.sh"
 
   postgrest:
     image: postgrest/postgrest:v12.2.3
@@ -73,8 +67,8 @@ services:
       ADMIN_EMAIL: admin@dashverse.local
       ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
     volumes:
-      - ./compose/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
-      - ./compose/superset/bootstrap.sh:/app/bootstrap.sh:ro
+      - ./superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/bootstrap.sh:/app/bootstrap.sh:ro
     user: root
     entrypoint: ["/bin/bash", "/app/bootstrap.sh"]
     restart: "no"
@@ -88,7 +82,7 @@ services:
     environment:
       <<: *superset-env
     volumes:
-      - ./compose/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/superset_config.py:/app/pythonpath/superset_config.py:ro
     ports:
       - "8088:8088"
     command:
@@ -107,7 +101,7 @@ services:
     environment:
       <<: *superset-env
     volumes:
-      - ./compose/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/superset_config.py:/app/pythonpath/superset_config.py:ro
     command:
       - /bin/sh
       - -c
@@ -124,17 +118,16 @@ services:
     environment:
       <<: *superset-env
     volumes:
-      - ./compose/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/superset_config.py:/app/pythonpath/superset_config.py:ro
     command:
       - /bin/sh
       - -c
       - |
         pip install --quiet psycopg2-binary flask-cors &&
-        celery --app=superset.tasks.celery_app:app beat --pidfile /tmp/celerybeat.pid
+        celery --app=superset.tasks.celery_app:app beat --pidfile /tmp/celerybeat.pid -s /tmp/celerybeat-schedule
 
   auth-service:
-    build: ./auth-service
-    image: dashverse/auth-service:latest
+    build: ../auth-service
     restart: unless-stopped
     depends_on:
       postgresql:
@@ -152,8 +145,7 @@ services:
       - "8000:8000"
 
   demo-portal:
-    build: ./demo-portal
-    image: dashverse/demo-portal:latest
+    build: ../demo-portal
     restart: unless-stopped
     depends_on:
       - superset
@@ -162,10 +154,11 @@ services:
       SUPERSET_EXTERNAL_URL: ${SUPERSET_EXTERNAL_URL:-http://localhost:8088}
       LOG_LEVEL: INFO
     ports:
-      - "8080:8080"
+      - "8083:8080"
 
   postgrest-docs-init:
     image: curlimages/curl:8.10.1
+    user: root
     depends_on:
       - postgrest
     volumes:
@@ -194,6 +187,7 @@ services:
 
   auth-docs-init:
     image: curlimages/curl:8.10.1
+    user: root
     depends_on:
       - auth-service
     volumes:
@@ -220,15 +214,6 @@ services:
     ports:
       - "8001:8080"
 
-  ofelia:
-    image: mcuadros/ofelia:v0.3.16
-    restart: unless-stopped
-    depends_on:
-      - postgresql
-    command: daemon --docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
   setup-dashboards:
     profiles: ["setup"]
     image: python:3.12-slim
@@ -245,7 +230,7 @@ services:
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_SCHEMA: api
     volumes:
-      - ./compose/superset:/app:ro
+      - ./superset:/app:ro
     working_dir: /app
     command:
       - /bin/sh
