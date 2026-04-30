@@ -50,35 +50,56 @@ Poetry is used for dependency management of the Python packages.
 
 </details>
 
+## Deployment configurations
+
+The deployment settings for both local (testing) and production environments can be found in `terraform/environments` folder.
+
 ## Deployment
 
 ### Quick Start
 
 1. Start minikube
 
-   ```shell
-   minikube start --cpus='4' --memory='4g'
-   ```
+**Note:** If you already have a kubernetes cluster, you can skip this step.
 
-2. Deploy
+```shell
+minikube start --cpus='4' --memory='4g'
+```
 
-   ```shell
-   make deploy
-   ```
-
-3. Access services
+1. Deploy
 
    ```shell
-   make port-forward
+   make deploy ENV=local
    ```
 
-   Then open:
-   - Superset: http://localhost:8088
-   - PostgREST API: http://localhost:3000
-   - PostgREST API Docs: http://localhost:3001
-   - Auth Service: http://localhost:8000
-   - Auth Service API Docs: http://localhost:8001
-   - Demo Portal: http://localhost:8080
+1. Verify pods are running
+
+   ```shell
+   make status
+   ```
+
+1. Access services
+
+On a `separate terminal` do port forwarding to be able to access the service
+
+```shell
+make port-forward
+```
+
+1. Deploy preconfigured dashboards
+
+   ```shell
+   make setup-dashboards ENV=local
+   ```
+
+Then open:
+
+- Superset: http://localhost:8088
+- PostgREST API: http://localhost:3000
+- PostgREST API Docs: http://localhost:3001
+- Auth Service: http://localhost:8000
+- Auth Service API Docs: http://localhost:8001
+- Demo Portal: http://localhost:8080
 
 ### Credentials
 

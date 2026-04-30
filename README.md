@@ -12,7 +12,6 @@ The dashboard prototype for the [EVERSE project](https://everse.software/).
 ## Documentation
 
 - [`docs/README.dev.md`](docs/README.dev.md) – **Developer Notes**: Instructions on configuration and deployment
-- [`docs/Deployment.md`](docs/Deployment.md) – deployment checklist and prerequisites.
 - [`docs/Kubernetes.md`](docs/Kubernetes.md) – operational commands for managing the Minikube deployment.
 - [`docs/Database.md`](docs/Database.md) – details of the PostgreSQL schema, assessment mapping, and populate script usage.
 - [`docs/API_examples.md`](docs/API_examples.md) – practical PostgREST calls, including the multi-step workflow for creating assessments.
