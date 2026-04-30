@@ -32,7 +32,7 @@ echo "  PostgREST Docs:  localhost:${POSTGREST_DOCS_PORT:-3001}"
 echo "  Superset:        localhost:${SUPERSET_PORT:-8088}"
 echo "  Auth Service:    localhost:${AUTH_PORT:-8000}"
 echo "  Auth Docs:       localhost:${AUTH_DOCS_PORT:-8001}"
-echo "  Demo Portal:     localhost:${DEMO_PORT:-8080}"
+echo "  Demo Portal:     localhost:${DEMO_PORT:-8083}"
 echo ""
 
 forward postgresql "${POSTGRES_PORT:-5432}" 5432 &
@@ -47,7 +47,7 @@ PIDS+=($!)
 forward auth-service "${AUTH_PORT:-8000}" 8000 &
 PIDS+=($!)
 
-forward demo-portal "${DEMO_PORT:-8080}" 8080 &
+forward demo-portal "${DEMO_PORT:-8083}" 8080 &
 PIDS+=($!)
 
 forward postgrest-docs "${POSTGREST_DOCS_PORT:-3001}" 3001 &
