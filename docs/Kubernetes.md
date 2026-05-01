@@ -8,26 +8,26 @@ Common commands for managing the DashVERSE deployment.
 # all resources in namespace
 kubectl get all -n dashverse
 
-# or use Makefile
-make status
+# or use justfile
+just status
 ```
 
 ## View Logs
 
 ```shell
 # all services
-make logs
+just logs
 
 # specific service
-make logs-postgres
-make logs-postgrest
-make logs-superset
+just logs-postgres
+just logs-postgrest
+just logs-superset
 ```
 
 ## Port Forwarding
 
 ```shell
-make port-forward
+just port-forward
 ```
 
 Services become available at:
@@ -59,10 +59,10 @@ Secrets are managed by OpenTofu and stored in Kubernetes. To view:
 kubectl get secrets -n dashverse
 ```
 
-Generate a JWT token for API access:
+Generate a JWT token for API access (register a user first at `http://localhost:8000/register`):
 
 ```shell
-./scripts/generate-jwt.sh
+just jwt <username> <password>
 ```
 
 ## Restart Services
@@ -72,6 +72,6 @@ Generate a JWT token for API access:
 kubectl rollout restart deployment/<name> -n dashverse
 
 # or redeploy everything
-make destroy
-make deploy
+just destroy
+just deploy
 ```

@@ -69,13 +69,13 @@ minikube start --cpus='4' --memory='4g'
 1. Deploy
 
    ```shell
-   make deploy ENV=local
+   just deploy env=local
    ```
 
 1. Verify pods are running
 
    ```shell
-   make status
+   just status
    ```
 
 1. Access services
@@ -83,13 +83,13 @@ minikube start --cpus='4' --memory='4g'
 On a `separate terminal` do port forwarding to be able to access the service
 
 ```shell
-make port-forward
+just port-forward
 ```
 
 1. Deploy preconfigured dashboards
 
    ```shell
-   make setup-dashboards ENV=local
+   just setup-dashboards env=local
    ```
 
 Then open:
@@ -106,14 +106,13 @@ Then open:
 Service credentials are auto-generated during deployment and stored securely in Kubernetes secrets. To retrieve them:
 
 ```shell
-make show-access
+just show-access
 ```
 
 This displays:
 
 - PostgreSQL connection details
 - Superset admin login
-- JWT secret for token signing
 
 You can also retrieve individual credentials with kubectl:
 
@@ -125,23 +124,23 @@ kubectl get secret dashverse-secrets -n dashverse -o jsonpath='{.data.postgres-p
 kubectl get secret dashverse-secrets -n dashverse -o jsonpath='{.data.superset-admin-password}' | base64 -d
 ```
 
-### Makefile Targets
+### Justfile Recipes
 
 | Target                  | Description                               |
 | ----------------------- | ----------------------------------------- |
-| `make deploy`           | Build images and deploy all services      |
-| `make destroy`          | Remove all services                       |
-| `make status`           | Show deployment status                    |
-| `make port-forward`     | Forward ports to localhost                |
-| `make logs`             | Tail all service logs                     |
-| `make logs-auth`        | Tail auth service logs                    |
-| `make sync`             | Download EVERSE indicators/dimensions     |
-| `make sync-apply`       | Download and import to database           |
-| `make sync-trigger`     | Trigger sync cronjob manually             |
-| `make jwt`              | Generate JWT token (CLI)                  |
-| `make build-auth`       | Build auth-service image                  |
-| `make setup-dashboards` | Configure Superset dashboards via Ansible |
-| `make seed-data`        | Import sample software and assessments    |
+| `just deploy`           | Build images and deploy all services      |
+| `just destroy`          | Remove all services                       |
+| `just status`           | Show deployment status                    |
+| `just port-forward`     | Forward ports to localhost                |
+| `just logs`             | Tail all service logs                     |
+| `just logs-auth`        | Tail auth service logs                    |
+| `just sync`             | Download EVERSE indicators/dimensions     |
+| `just sync-apply`       | Download and import to database           |
+| `just sync-trigger`     | Trigger sync cronjob manually             |
+| `just jwt`              | Generate JWT token (CLI)                  |
+| `just build-auth`       | Build auth-service image                  |
+| `just setup-dashboards` | Configure Superset dashboards via Ansible |
+| `just seed-data`        | Import sample software and assessments    |
 
 ### Manual Deployment
 
@@ -155,14 +154,14 @@ tofu apply -var-file="environments/local.tfvars"
 
 ```shell
 # Deploy all services (builds images and applies Terraform)
-make deploy ENV=production
+just deploy env=production
 
 # Populate data
-make sync-apply
-make seed-data
+just sync-apply
+just seed-data
 
 # Configure Superset dashboards
-make setup-dashboards ENV=production
+just setup-dashboards env=production
 ```
 
 The production configuration (`terraform/environments/production.tfvars`) includes settings for external URLs used in iframe embedding.
@@ -175,13 +174,13 @@ https://github.com/EVERSE-ResearchSoftware/indicators
 The sync runs automatically daily at 2am via a CronJob. To trigger manually:
 
 ```shell
-make sync-trigger
+just sync-trigger
 ```
 
 Or to sync outside the cluster:
 
 ```shell
-make sync-apply
+just sync-apply
 ```
 
 ### Authentication
@@ -193,10 +192,10 @@ The Auth Service provides a web interface for user registration and JWT token ge
 3. Login and generate an API token
 4. Use the token for PostgREST write access
 
-Alternatively, generate a token via CLI:
+Alternatively, generate a token via CLI (register a user first):
 
 ```shell
-make jwt
+just jwt <username> <password>
 ```
 
 ### API Documentation
@@ -213,7 +212,7 @@ The documentation is automatically generated from OpenAPI specifications and inc
 After deployment, configure Superset with pre-built dashboards using Ansible:
 
 ```shell
-make setup-dashboards
+just setup-dashboards
 ```
 
 This creates five role-based dashboards based on [RSQKit roles](https://everse.software/RSQKit/your_role):
@@ -227,7 +226,7 @@ This creates five role-based dashboards based on [RSQKit roles](https://everse.s
 Prerequisites:
 
 - Ansible (2.9+)
-- Port forwarding running (`make port-forward`)
+- Port forwarding running (`just port-forward`)
 - Superset accessible at localhost:8088
 
 The Superset admin password is automatically retrieved from Kubernetes secrets during setup.
@@ -237,7 +236,7 @@ The Superset admin password is automatically retrieved from Kubernetes secrets d
 To populate the system with sample software and assessments for testing:
 
 ```shell
-make seed-data
+just seed-data
 ```
 
 This fetches software metadata from the EVERSE TechRadar repository and generates sample assessments. The data will appear in the Superset dashboards.
@@ -256,7 +255,7 @@ This fetches software metadata from the EVERSE TechRadar repository and generate
 Remove all deployed resources:
 
 ```shell
-make destroy
+just destroy
 ```
 
 Delete the minikube cluster:
