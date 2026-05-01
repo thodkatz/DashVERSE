@@ -22,5 +22,5 @@ on first startup.
 To deploy:
 
 ```sh
-just deploy env=local
+just env=local deploy
 ```

@@ -63,7 +63,7 @@ minikube start --cpus='4' --memory='4g'
 1. Deploy
 
    ```shell
-   just deploy env=local
+   just env=local deploy
    ```
 
 1. Verify pods are running
@@ -83,7 +83,7 @@ just port-forward
 1. Deploy preconfigured dashboards
 
    ```shell
-   just setup-dashboards env=local
+   just env=local setup-dashboards
    ```
 
 Then open:
@@ -148,14 +148,14 @@ tofu apply -var-file="environments/local.tfvars"
 
 ```shell
 # Deploy all services (builds images and applies Terraform)
-just deploy env=production
+just env=production deploy
 
 # Populate data
 just sync-apply
 just seed-data
 
 # Configure Superset dashboards
-just setup-dashboards env=production
+just env=production setup-dashboards
 ```
 
 The production configuration (`terraform/environments/production.tfvars`) includes settings for external URLs used in iframe embedding.
