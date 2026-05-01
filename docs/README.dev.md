@@ -26,12 +26,6 @@ Pyenv allows developers to install multiple versions of Python distribution and 
 
 Website: <https://github.com/pyenv/pyenv?tab=readme-ov-file#installation>
 
-### Poetry (optional)
-
-Poetry is used for dependency management of the Python packages.
-
-<https://python-poetry.org/docs/#installation>
-
 ### Podman
 
 <https://podman.io/docs/installation>

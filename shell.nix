@@ -13,7 +13,6 @@ pkgs.mkShell {
     python313
     minikube
     podman
-    # poetry
     # kubernetes
     kubernetes-helm
     kubectl
