@@ -1,7 +1,8 @@
 # DashVERSE task runner
 #
-# Usage: just <recipe> [args]
-# List all recipes: just --list
+# Usage:        just <recipe> [args]
+# List recipes: just --list
+# Override var: just env=production <recipe>     (assignment BEFORE recipe name)
 
 env := "local"
 ns := "dashverse"
@@ -83,7 +84,7 @@ sync-trigger:
 # Generate a JWT (auth-service must be reachable via 'just port-forward')
 # Register a user first at http://localhost:8000/register
 jwt username password:
-    @curl -sf -X POST http://localhost:8000/api/auth/login \
+    @curl -sSf -X POST http://localhost:8000/api/auth/login \
         -H "Content-Type: application/json" \
         -d '{"username":"{{username}}","password":"{{password}}"}' \
         | jq -r .access_token
