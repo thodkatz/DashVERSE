@@ -2,7 +2,6 @@
 
 ENV ?= local
 NS ?= dashverse
-SYNC_DIR ?= /tmp/everse-sync
 
 deploy: build-auth build-demo
 	cd terraform && tofu init && tofu apply -var-file="environments/$(ENV).tfvars" -auto-approve
@@ -46,11 +45,12 @@ clean:
 	cd terraform && rm -rf .terraform .terraform.lock.hcl .tofu
 
 sync:
-	./scripts/sync-everse.sh $(SYNC_DIR)
+	cd ansible && \
+		ansible-playbook -i inventory/$(ENV).yml playbooks/sync_everse.yml --tags fetch
 
 sync-apply:
-	./scripts/sync-everse.sh $(SYNC_DIR)
-	./scripts/import-everse.sh $(SYNC_DIR) $(NS) --apply
+	cd ansible && \
+		ansible-playbook -i inventory/$(ENV).yml playbooks/sync_everse.yml
 
 sync-trigger:
 	kubectl create job -n $(NS) --from=cronjob/everse-sync everse-sync-manual-$$(date +%s)
