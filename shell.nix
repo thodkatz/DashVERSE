@@ -8,6 +8,7 @@ pkgs.mkShell {
     vim
     which
     git
+    just
 
     python313
     minikube

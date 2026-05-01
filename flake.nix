@@ -22,6 +22,7 @@
             which
             git
             jq
+            just
 
             python313
             minikube
