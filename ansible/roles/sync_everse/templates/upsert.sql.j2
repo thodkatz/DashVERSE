@@ -4,7 +4,7 @@ BEGIN;
 
 -- dimensions
 {% for r in dimension_files.results %}
-{%   set d = r.json %}
+{%   set d = r.content | from_json %}
 {%   if d.abbreviation and d.name %}
 {%     set name = d.name | replace("'", "''") %}
 {%     set desc = (d.description | default('')) | replace("'", "''") %}
@@ -21,7 +21,7 @@ ON CONFLICT (identifier) DO UPDATE SET
 
 -- indicators
 {% for r in indicator_files.results %}
-{%   set i = r.json %}
+{%   set i = r.content | from_json %}
 {%   if i.abbreviation and i.name %}
 {%     set name = i.name | replace("'", "''") %}
 {%     set desc = (i.description | default('')) | replace("'", "''") %}
