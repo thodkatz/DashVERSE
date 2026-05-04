@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 import jwt
 from passlib.context import CryptContext
@@ -41,9 +41,9 @@ def create_access_token(
 ) -> tuple[str, str, datetime]:
     # Returns (jwt_token, jti, expires_at)
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(days=settings.JWT_EXPIRATION_DAYS)
+        expire = datetime.now(timezone.utc) + timedelta(days=settings.JWT_EXPIRATION_DAYS)
 
     # unique jti for tracking this token
     jti = str(uuid.uuid4())
@@ -55,7 +55,7 @@ def create_access_token(
         "role": "web_user",  # role for postgrest
         "aud": "postgrest",
         "exp": expire,
-        "iat": datetime.utcnow(),
+        "iat": datetime.now(timezone.utc),
         "jti": jti,
     }
 

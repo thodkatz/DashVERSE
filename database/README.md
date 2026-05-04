@@ -1,15 +1,11 @@
 # Database
 
-PostgreSQL database for DashVERSE, including the schema, views, and seed data
-used by PostgREST and Superset.
+PostgreSQL schema, views, and seed data used by PostgREST and Superset.
 
 ## Structure
 
-- `everse_db/` -- SQLAlchemy models and configuration
 - `sql/schema/` -- SQL files applied in numeric order during init
 - `sql/data/` -- seed data loaded after schema creation
-- `main.py` -- ORM-based database initialisation script
-- `populate_data.py` -- generates mock data for testing
 
 ## Schema overview
 
@@ -23,10 +19,8 @@ The SQL schema files are loaded into Kubernetes as a ConfigMap by the
 `/docker-entrypoint-initdb.d/` and runs the scripts in alphabetical order
 on first startup.
 
-To deploy with Terraform:
+To deploy:
 
 ```sh
-cd terraform
-tofu init
-tofu apply -var-file="environments/local.tfvars"
+just env=local deploy
 ```

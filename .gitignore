@@ -10,12 +10,6 @@
 *credential*
 *credentials.json
 
-kubernetes/deployments
-dashverse-values-with-secrets.yaml
-
-**/DBModel/db_config.json
-*-generate_jwt.sh
-
 *.log
 *.pyc
 
@@ -27,10 +21,6 @@ venv3
 .direnv
 
 *.env
-
-# Deployment artifacts
-deployments/
-backups/
 
 # Terraform
 .terraform/

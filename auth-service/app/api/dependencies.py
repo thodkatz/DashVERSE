@@ -86,30 +86,6 @@ async def get_current_user(
     return user
 
 
-async def get_current_active_user(
-    current_user: User = Depends(get_current_user)
-):
-    """Ensure user is active."""
-    if not current_user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Inactive user"
-        )
-    return current_user
-
-
-async def get_current_superuser(
-    current_user: User = Depends(get_current_user)
-):
-    """Check if user is superuser."""
-    if not current_user.is_superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions"
-        )
-    return current_user
-
-
 def get_client_ip(request: Request) -> Optional[str]:
     """Extract client IP from request headers."""
     # Try to get real IP from X-Forwarded-For header (when behind proxy)

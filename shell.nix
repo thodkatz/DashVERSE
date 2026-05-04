@@ -8,11 +8,11 @@ pkgs.mkShell {
     vim
     which
     git
+    just
 
     python313
     minikube
     podman
-    # poetry
     # kubernetes
     kubernetes-helm
     kubectl

@@ -9,7 +9,7 @@ This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By particip
 ## Reporting bugs and asking questions
 
 - Search [open issues](https://github.com/EVERSE-ResearchSoftware/DashVERSE/issues) first to avoid duplicates.
-- A useful bug report includes: deployment target (local minikube, production), the command you ran, expected vs observed behaviour, and any relevant log snippets from `make logs`.
+- A useful bug report includes: deployment target (local minikube, production), the command you ran, expected vs observed behaviour, and any relevant log snippets from `just logs`.
 - For questions about EVERSE indicators, dimensions, or the assessment schema, the upstream repos are the right place:
   - <https://github.com/EVERSE-ResearchSoftware/indicators>
   - <https://github.com/EVERSE-ResearchSoftware/schemas>
@@ -25,12 +25,12 @@ See [`docs/README.dev.md`](docs/README.dev.md) for the full setup. Short version
 
 1. Install OpenTofu, kubectl, helm, minikube, ansible, and Docker or Podman. If you have Nix, `nix develop` provides everything.
 2. Start minikube: `minikube start --cpus='4' --memory='8g'`
-3. Deploy: `make deploy ENV=local`
-4. Port-forward in a separate terminal: `make port-forward`
-5. Configure dashboards: `make setup-dashboards ENV=local`
-6. Optional sample data: `make seed-data`
+3. Deploy: `just env=local deploy`
+4. Port-forward in a separate terminal: `just port-forward`
+5. Configure dashboards: `just env=local setup-dashboards`
+6. Optional sample data: `just seed-data`
 
-Tear down with `make destroy`, or `minikube delete` for a full reset.
+Tear down with `just destroy`, or `minikube delete` for a full reset.
 
 ## Branches and commits
 
@@ -49,7 +49,7 @@ Tear down with `make destroy`, or `minikube delete` for a full reset.
 1. Push your branch and open a PR against `main` describing what changed and why.
 2. Link related issues with `Closes #NN`.
 3. If your change affects dashboards, include a before/after screenshot or a list of affected charts.
-4. CI is still being set up; until it lands, please confirm at least that `make deploy ENV=local` succeeds end-to-end on a clean minikube.
+4. CI is still being set up; until it lands, please confirm at least that `just env=local deploy` succeeds end-to-end on a clean minikube.
 5. Be patient with review. Maintainers triage on a best-effort basis.
 
 ## Code style

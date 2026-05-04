@@ -47,7 +47,6 @@ def get_user_from_session(request: Request, db: Session) -> Optional[User]:
         return None
 
     user = db.query(User).filter(User.id == int(user_id)).first()
-    # temp solution - just check active status
     return user if user and user.is_active else None
 
 

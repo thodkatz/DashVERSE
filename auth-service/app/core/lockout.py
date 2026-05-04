@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -12,7 +12,7 @@ def record_failed_login(db, username, ip_address=None):
     attempt = FailedLoginAttempt(
         username=username,
         ip_address=ip_address,
-        attempt_time=datetime.utcnow()
+        attempt_time=datetime.now(timezone.utc)
     )
     db.add(attempt)
     db.commit()
@@ -20,7 +20,7 @@ def record_failed_login(db, username, ip_address=None):
 
 def get_recent_failed_attempts(db: Session, username: str, window_minutes: int = 15):
     """Get count of recent failed login attempts."""
-    cutoff_time = datetime.utcnow() - timedelta(minutes=window_minutes)
+    cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=window_minutes)
 
     count = db.query(FailedLoginAttempt).filter(
         and_(
@@ -45,8 +45,7 @@ def is_account_locked(db: Session, username: str) -> tuple[bool, Optional[dateti
     if not latest_attempt or not latest_attempt.locked_until:
         return False, None
 
-    # quick fix - check if lock is still active
-    if latest_attempt.locked_until > datetime.utcnow():
+    if latest_attempt.locked_until > datetime.now(timezone.utc):
         return True, latest_attempt.locked_until
 
     return False, None
@@ -57,12 +56,12 @@ def lock_account(db, username, duration_minutes=None):
     if duration_minutes is None:
         duration_minutes = settings.LOCKOUT_DURATION_MINUTES
 
-    locked_until = datetime.utcnow() + timedelta(minutes=duration_minutes)
+    locked_until = datetime.now(timezone.utc) + timedelta(minutes=duration_minutes)
 
     # Create a lockout record
     lockout_record = FailedLoginAttempt(
         username=username,
-        attempt_time=datetime.utcnow(),
+        attempt_time=datetime.now(timezone.utc),
         locked_until=locked_until
     )
     db.add(lockout_record)
@@ -94,7 +93,7 @@ def check_and_handle_login_attempt(
     is_locked, locked_until = is_account_locked(db, username)
 
     if is_locked:
-        minutes_remaining = int((locked_until - datetime.utcnow()).total_seconds() / 60) + 1
+        minutes_remaining = int((locked_until - datetime.now(timezone.utc)).total_seconds() / 60) + 1
         error_msg = (
             f"Account is locked due to too many failed login attempts. "
             f"Please try again in {minutes_remaining} minute(s)."
