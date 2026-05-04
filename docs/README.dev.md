@@ -63,7 +63,7 @@ The deployment settings for both local (testing) and production environments can
    - PostgREST API Docs: http://localhost:3001
    - Auth Service: http://localhost:8000
    - Auth Service API Docs: http://localhost:8001
-   - Demo Portal: http://localhost:8080
+   - Landing site: http://localhost:8080
 
 At this point should have all the configured services and preconfigured dashboards available. You can start adding assessment data to the dashboard.
 
@@ -115,7 +115,7 @@ kubectl get secret dashverse-secrets -n dashverse -o jsonpath='{.data.superset-a
 | `just show-access`              | Print PostgreSQL and Superset credentials              |
 | `just logs`                     | Tail all service logs                                  |
 | `just logs-auth`                | Tail auth-service logs                                 |
-| `just logs-demo`                | Tail demo-portal logs                                  |
+| `just logs-landing`             | Tail landing logs                                      |
 | `just logs-postgres`            | Tail PostgreSQL logs                                   |
 | `just logs-postgrest`           | Tail PostgREST logs                                    |
 | `just logs-superset`            | Tail Superset logs                                     |
@@ -124,7 +124,7 @@ kubectl get secret dashverse-secrets -n dashverse -o jsonpath='{.data.superset-a
 | `just sync-trigger`             | Trigger the in-cluster sync cronjob manually           |
 | `just jwt <username> <password>`| Generate a JWT token via auth-service login            |
 | `just build-auth`               | Build the auth-service image                           |
-| `just build-demo`               | Build the demo-portal image                            |
+| `just build-landing`            | Build the landing image                                |
 | `just setup-dashboards`         | Configure Superset dashboards via Ansible              |
 | `just seed-data`                | Import sample assessment data                          |
 | `just clean`                    | Remove local terraform state and lock files            |
