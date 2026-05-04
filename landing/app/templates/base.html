@@ -405,56 +405,6 @@ footer a {
     min-width: 60px;
 }
 
-/* data page */
-.data-sources {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.data-source-card {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1.5rem;
-}
-
-.data-source-card h3 {
-    color: var(--color-purple);
-    margin-bottom: 0.5rem;
-}
-
-.data-source-card p {
-    color: var(--color-text-muted);
-    margin-bottom: 1rem;
-}
-
-.data-source-card dl {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 0.5rem 1rem;
-}
-
-.data-source-card dt {
-    font-weight: 600;
-    color: var(--color-text);
-}
-
-.data-source-card dd {
-    color: var(--color-text-muted);
-    font-family: monospace;
-    font-size: 0.9rem;
-}
-
-.data-origin-note {
-    font-style: italic;
-    background: var(--color-light-bg);
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 4px solid var(--color-blue);
-}
-
 /* nav separator */
 .nav-separator {
     width: 1px;
@@ -739,7 +689,6 @@ footer a {
                 {% endfor %}
                 <li class="nav-separator"></li>
                 <li><a href="/concepts" {% if request.url.path == '/concepts' %}class="active"{% endif %}>Concepts</a></li>
-                <li><a href="/data" {% if request.url.path == '/data' %}class="active"{% endif %}>Data</a></li>
             </ul>
         </nav>
     </header>
