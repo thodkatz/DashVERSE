@@ -11,11 +11,7 @@ The dashboard prototype for the [EVERSE project](https://everse.software/).
 
 ## Documentation
 
-- [`docs/README.dev.md`](docs/README.dev.md) – **Developer Notes**: Instructions on configuration and deployment
-- [`docs/Kubernetes.md`](docs/Kubernetes.md) – operational commands for managing the Minikube deployment.
-- [`docs/Database.md`](docs/Database.md) – details of the PostgreSQL schema, assessment mapping, and populate script usage.
-- [`docs/API_examples.md`](docs/API_examples.md) – practical PostgREST calls, including the multi-step workflow for creating assessments.
-- [`docs/Superset.md`](docs/Superset.md) – notes on Apache Superset datasets and views
+See [`docs/README.dev.md`](docs/README.dev.md) for the developer notes, instructions on configuration and deployment
 
 ## Use of AI in the Development Process
 
