@@ -231,7 +231,7 @@ main {
 .dashboard-embed iframe {
     display: block;
     width: 100%;
-    height: 100%;
+    border: 0;
 }
 
 body.embed {
@@ -240,12 +240,23 @@ body.embed {
 }
 
 body.embed main {
+    flex: 1;
+    min-height: 0;
     max-width: none;
     padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 body.embed .dashboard-embed {
-    height: 100%;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+
+body.embed .dashboard-embed iframe {
+    flex: 1;
+    min-height: 0;
 }
 
 /* footer */
