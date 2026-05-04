@@ -100,9 +100,9 @@ module "auth_service" {
   module_depends_on = [module.postgresql]
 }
 
-# demo portal for public dashboard access
-module "demo_portal" {
-  source = "./modules/demo-portal"
+# landing site for public dashboard access
+module "landing" {
+  source = "./modules/landing"
 
   namespace_name = module.namespace.name
   common_labels  = var.common_labels

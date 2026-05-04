@@ -3,10 +3,10 @@ variable "namespace_name" {
   type        = string
 }
 
-variable "demo_portal_image" {
-  description = "Docker image for demo portal"
+variable "landing_image" {
+  description = "Docker image for landing site"
   type        = string
-  default     = "dashverse/demo-portal:latest"
+  default     = "dashverse/landing:latest"
 }
 
 variable "replicas" {
