@@ -275,30 +275,6 @@ footer a {
     color: var(--color-blue);
 }
 
-/* concepts link section */
-.concepts-link {
-    background: #f3e8f8;
-    border: 1px solid #d8c4e3;
-    border-radius: 8px;
-    padding: 1.5rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-.concepts-link h2 {
-    color: var(--color-purple);
-    margin-bottom: 0.5rem;
-}
-
-.concepts-link p {
-    color: var(--color-text-muted);
-}
-
-.concepts-link a {
-    color: var(--color-blue);
-    font-weight: 600;
-}
-
 /* concepts page */
 .concepts-grid {
     display: grid;
@@ -307,54 +283,35 @@ footer a {
     margin-bottom: 2rem;
 }
 
+@media (max-width: 1000px) {
+    .concepts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .concepts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .concept-card {
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 1.5rem;
-    transition: box-shadow 0.2s, transform 0.2s;
+    transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .concept-card:hover {
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    border-color: var(--color-purple);
 }
-
-.concept-card.dimension { border-top: 4px solid #9b6bb3; }
-.concept-card.indicator { border-top: 4px solid #5a9bbf; }
-.concept-card.assessment { border-top: 4px solid #bf9b5a; }
-.concept-card.check { border-top: 4px solid #5abf9b; }
-.concept-card.schema { border-top: 4px solid #bf5a5a; }
-
-.concept-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.concept-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: white;
-}
-
-.concept-card.dimension .concept-icon { background: #9b6bb3; }
-.concept-card.indicator .concept-icon { background: #5a9bbf; }
-.concept-card.assessment .concept-icon { background: #bf9b5a; }
-.concept-card.check .concept-icon { background: #5abf9b; }
-.concept-card.schema .concept-icon { background: #bf5a5a; }
 
 .concept-card h2 {
-    color: var(--color-text);
-    margin: 0;
-    font-size: 1.25rem;
+    color: var(--color-purple);
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
 }
 
 .concept-card .definition {
