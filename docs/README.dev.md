@@ -2,47 +2,16 @@
 
 ## Requirements
 
-- OpenTofu (1.6+) or Terraform (1.6+)
-- kubectl (1.28+)
-- helm (3.0+)
-- minikube (1.30+)
-- Docker or Podman
-- Ansible (2.9+)
+- [just](https://github.com/casey/just)
+- [OpenTofu (1.6+) or Terraform (1.6+)]()
+- [kubectl (1.28+)]()
+- [helm (3.0+)](https://helm.sh/docs/intro/install)
+- [minikube (1.30+)](https://minikube.sigs.k8s.io/docs/start)
+- [Docker](https://docs.docker.com/engine/install) or [Podman](https://podman.io/docs/installation)
+- [Ansible (2.9+)]()
+- [Python](https://www.python.org/downloads)
 
 If you have Nix installed, all dependencies are provided via `nix develop`.
-
-<details>
-<summary>
-    Links for the requirements
-</summary>
-
-### Python
-
-<https://www.python.org/downloads>
-
-### Pyenv (optional)
-
-Pyenv allows developers to install multiple versions of Python distribution and easy switching between the installed versions.
-
-Website: <https://github.com/pyenv/pyenv?tab=readme-ov-file#installation>
-
-### Podman
-
-<https://podman.io/docs/installation>
-
-### Docker
-
-<https://docs.docker.com/engine/install>
-
-### minikube
-
-<https://minikube.sigs.k8s.io/docs/start>
-
-### helm
-
-<https://helm.sh/docs/intro/install>
-
-</details>
 
 ## Deployment configurations
 
@@ -54,13 +23,13 @@ The deployment settings for both local (testing) and production environments can
 
 1. Start minikube
 
-**Note:** If you already have a kubernetes cluster, you can skip this step.
+   **Note:** If you already have a kubernetes cluster, you can skip this step.
 
-```shell
-minikube start --cpus='4' --memory='4g'
-```
+   ```shell
+   minikube start --cpus='4' --memory='4g'
+   ```
 
-1. Deploy
+1. Deploy the services locally
 
    ```shell
    just env=local deploy
@@ -72,13 +41,12 @@ minikube start --cpus='4' --memory='4g'
    just status
    ```
 
-1. Access services
+1. Do port forwarding for the services to be able to access
+   On a `separate terminal` do port forwarding to be able to access the service. Make sure to keep this terminal for the next steps.
 
-On a `separate terminal` do port forwarding to be able to access the service
-
-```shell
-just port-forward
-```
+   ```shell
+   just port-forward
+   ```
 
 1. Deploy preconfigured dashboards
 
@@ -86,14 +54,28 @@ just port-forward
    just env=local setup-dashboards
    ```
 
-Then open:
+1. Access services
 
-- Superset: http://localhost:8088
-- PostgREST API: http://localhost:3000
-- PostgREST API Docs: http://localhost:3001
-- Auth Service: http://localhost:8000
-- Auth Service API Docs: http://localhost:8001
-- Demo Portal: http://localhost:8080
+   Then open:
+
+   - Superset: http://localhost:8088
+   - PostgREST API: http://localhost:3000
+   - PostgREST API Docs: http://localhost:3001
+   - Auth Service: http://localhost:8000
+   - Auth Service API Docs: http://localhost:8001
+   - Demo Portal: http://localhost:8080
+
+At this point should have all the configured services and preconfigured dashboards available. You can start adding assessment data to the dashboard.
+
+### Sample Data
+
+To populate the system with sample software and assessments for testing:
+
+```shell
+just seed-data
+```
+
+The data will appear in the Superset dashboards.
 
 ### Credentials
 
@@ -236,21 +218,9 @@ Prerequisites:
 
 The Superset admin password is automatically retrieved from Kubernetes secrets during setup.
 
-### Sample Data
-
-To populate the system with sample software and assessments for testing:
-
-```shell
-just seed-data
-```
-
-This fetches software metadata from the EVERSE TechRadar repository and generates sample assessments. The data will appear in the Superset dashboards.
 
 ## Documentation
 
-- `docs/README.dev.md` – **Developer Notes**: Instructions on configuration and deployment
-- `docs/architecture/README.md` – **System Architecture**: Detailed diagrams of the system, data flow, and security model.
-- `docs/Deployment.md` – deployment checklist and prerequisites.
 - `docs/Kubernetes.md` – operational commands for managing the Minikube deployment.
 - `docs/Database.md` – details of the PostgreSQL schema, assessment mapping, and populate script usage.
 - `docs/API_examples.md` – practical PostgREST calls, including the multi-step workflow for creating assessments.
@@ -263,9 +233,8 @@ Remove all deployed resources:
 just destroy
 ```
 
-Delete the minikube cluster:
+Delete the resources and the minikube cluster:
 
 ```shell
-minikube stop
-minikube delete
+just destroy-all
 ```
