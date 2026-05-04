@@ -229,14 +229,23 @@ main {
 }
 
 .dashboard-embed iframe {
+    display: block;
     width: 100%;
-    height: calc(100vh - 160px);
-    min-height: 600px;
+    height: 100%;
+}
+
+body.embed {
+    height: 100vh;
+    overflow: hidden;
 }
 
 body.embed main {
     max-width: none;
     padding: 0;
+}
+
+body.embed .dashboard-embed {
+    height: 100%;
 }
 
 /* footer */
