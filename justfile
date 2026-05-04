@@ -12,7 +12,7 @@ default:
     @just --list
 
 # Build images and deploy all services
-deploy: build-auth build-demo
+deploy: build-auth build-landing
     cd terraform && tofu init && tofu apply -var-file="environments/{{env}}.tfvars" -auto-approve
 
 # Remove all deployed services
@@ -34,7 +34,7 @@ port-forward:
     kubectl port-forward -n {{ns}} svc/postgrest 3000:3000 & \
     kubectl port-forward -n {{ns}} svc/superset 8088:8088 & \
     kubectl port-forward -n {{ns}} svc/auth-service 8000:8000 & \
-    kubectl port-forward -n {{ns}} svc/demo-portal 8080:8080 & \
+    kubectl port-forward -n {{ns}} svc/landing 8080:8080 & \
     kubectl port-forward -n {{ns}} svc/postgrest-docs 3001:3001 & \
     kubectl port-forward -n {{ns}} svc/auth-docs 8001:8001 & \
     wait
@@ -59,9 +59,9 @@ logs-superset:
 logs-auth:
     kubectl logs -n {{ns}} -l app=auth-service -f
 
-# Tail demo-portal logs
-logs-demo:
-    kubectl logs -n {{ns}} -l app=demo-portal -f
+# Tail landing logs
+logs-landing:
+    kubectl logs -n {{ns}} -l app=landing -f
 
 # Remove terraform state and lock files
 clean:
@@ -97,12 +97,12 @@ build-auth:
         docker build -t dashverse/auth-service:latest auth-service/; \
     fi
 
-# Build the demo-portal image
-build-demo:
+# Build the landing image
+build-landing:
     if [ "{{env}}" = "local" ]; then \
-        minikube image build -t dashverse/demo-portal:latest demo-portal/; \
+        minikube image build -t dashverse/landing:latest landing/; \
     else \
-        docker build -t dashverse/demo-portal:latest demo-portal/; \
+        docker build -t dashverse/landing:latest landing/; \
     fi
 
 # Configure Superset dashboards via Ansible

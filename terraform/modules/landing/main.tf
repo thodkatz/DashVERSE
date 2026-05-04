@@ -1,6 +1,6 @@
-resource "kubernetes_deployment" "demo_portal" {
+resource "kubernetes_deployment" "landing" {
   metadata {
-    name      = "demo-portal"
+    name      = "landing"
     namespace = var.namespace_name
     labels    = var.common_labels
   }
@@ -12,7 +12,7 @@ resource "kubernetes_deployment" "demo_portal" {
 
     selector {
       match_labels = {
-        app = "demo-portal"
+        app = "landing"
       }
     }
 
@@ -21,15 +21,15 @@ resource "kubernetes_deployment" "demo_portal" {
         labels = merge(
           var.common_labels,
           {
-            app = "demo-portal"
+            app = "landing"
           }
         )
       }
 
       spec {
         container {
-          name              = "demo-portal"
-          image             = var.demo_portal_image
+          name              = "landing"
+          image             = var.landing_image
           image_pull_policy = "IfNotPresent"
 
           port {
@@ -104,9 +104,9 @@ resource "kubernetes_deployment" "demo_portal" {
   }
 }
 
-resource "kubernetes_service" "demo_portal" {
+resource "kubernetes_service" "landing" {
   metadata {
-    name      = "demo-portal"
+    name      = "landing"
     namespace = var.namespace_name
     labels    = var.common_labels
   }
@@ -117,7 +117,7 @@ resource "kubernetes_service" "demo_portal" {
     type = "ClusterIP"
 
     selector = {
-      app = "demo-portal"
+      app = "landing"
     }
 
     port {

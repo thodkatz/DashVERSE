@@ -12,11 +12,8 @@
 </section>
 
 <section class="concepts-grid">
-    <div class="concept-card dimension">
-        <div class="concept-header">
-            <span class="concept-icon">D</span>
-            <h2>Dimension</h2>
-        </div>
+    <div class="concept-card">
+        <h2>Dimension</h2>
         <p class="definition">
             A high-level quality aspect of research software. Dimensions are the broadest
             category in the EVERSE quality framework and group related quality concerns together.
@@ -31,11 +28,8 @@
         </div>
     </div>
 
-    <div class="concept-card indicator">
-        <div class="concept-header">
-            <span class="concept-icon">I</span>
-            <h2>Indicator</h2>
-        </div>
+    <div class="concept-card">
+        <h2>Indicator</h2>
         <p class="definition">
             A specific, measurable quality criterion within a dimension. Each indicator
             defines what aspect of quality is being measured and how it can be evaluated.
@@ -48,11 +42,8 @@
         </div>
     </div>
 
-    <div class="concept-card assessment">
-        <div class="concept-header">
-            <span class="concept-icon">A</span>
-            <h2>Assessment</h2>
-        </div>
+    <div class="concept-card">
+        <h2>Assessment</h2>
         <p class="definition">
             A complete quality evaluation of a software project performed at a specific point
             in time. It captures which software was assessed, when, and by what tools.
@@ -65,11 +56,8 @@
         </div>
     </div>
 
-    <div class="concept-card check">
-        <div class="concept-header">
-            <span class="concept-icon">C</span>
-            <h2>Check</h2>
-        </div>
+    <div class="concept-card">
+        <h2>Check</h2>
         <p class="definition">
             A single test result within an assessment. It represents the outcome of
             evaluating one indicator for a specific software project.
@@ -81,11 +69,8 @@
         </div>
     </div>
 
-    <div class="concept-card schema">
-        <div class="concept-header">
-            <span class="concept-icon">S</span>
-            <h2>Schema</h2>
-        </div>
+    <div class="concept-card">
+        <h2>Schema</h2>
         <p class="definition">
             A formal data structure for quality assessment results. Schemas define the
             shape of the data, ensuring consistency and interoperability. Assessment data
@@ -104,56 +89,31 @@
 <section class="relationships">
     <h2>How They Relate</h2>
     <div class="relationship-flow">
-        <div class="flow-column">
-            <div class="flow-header">Quality Framework</div>
-            <div class="flow-box dimension-box">
-                <strong>Dimension</strong>
-                <small>e.g., Documentation</small>
-            </div>
-            <div class="flow-connector">
-                <span class="connector-line"></span>
-                <span class="connector-label">contains many</span>
-            </div>
-            <div class="flow-box indicator-box">
-                <strong>Indicator</strong>
-                <small>e.g., README exists</small>
-            </div>
+        <div class="rel-tile">
+            <div class="rel-name">Dimension</div>
+            <div class="rel-hint">broad area</div>
         </div>
-
-        <div class="flow-separator"></div>
-
-        <div class="flow-column">
-            <div class="flow-header">Evaluation Results</div>
-            <div class="flow-box assessment-box">
-                <strong>Assessment</strong>
-                <small>e.g., Project X on Jan 15</small>
-            </div>
-            <div class="flow-connector">
-                <span class="connector-line"></span>
-                <span class="connector-label">contains many</span>
-            </div>
-            <div class="flow-box check-box">
-                <strong>Check</strong>
-                <small>e.g., README: Pass</small>
-            </div>
+        <span class="rel-arrow" aria-hidden="true">&rarr;</span>
+        <div class="rel-tile">
+            <div class="rel-name">Indicator</div>
+            <div class="rel-hint">measurable criterion</div>
         </div>
-
-        <div class="flow-separator"></div>
-
-        <div class="flow-column flow-link">
-            <div class="flow-header">Connection</div>
-            <div class="link-diagram">
-                <div class="link-box check-box">Check</div>
-                <div class="link-arrow">tests</div>
-                <div class="link-box indicator-box">Indicator</div>
-            </div>
-            <p class="link-explanation">
-                Each check evaluates exactly one indicator and produces a status result.
-            </p>
+        <span class="rel-arrow" aria-hidden="true">&rarr;</span>
+        <div class="rel-tile">
+            <div class="rel-name">Check</div>
+            <div class="rel-hint">single result</div>
+        </div>
+        <span class="rel-arrow" aria-hidden="true">&larr;</span>
+        <div class="rel-tile">
+            <div class="rel-name">Assessment</div>
+            <div class="rel-hint">full evaluation</div>
         </div>
     </div>
-
-    </div>
+    <p class="rel-caption">
+        A <strong>Dimension</strong> contains many <strong>Indicators</strong>. An
+        <strong>Assessment</strong> contains many <strong>Checks</strong>. Each
+        <strong>Check</strong> evaluates exactly one <strong>Indicator</strong>.
+    </p>
 </section>
 
 <section class="example-assessment">
