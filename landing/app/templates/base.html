@@ -216,7 +216,6 @@ main {
 /* dashboard embed page */
 .dashboard-embed {
     background: var(--color-light-bg);
-    border-radius: 8px;
     overflow: hidden;
 }
 
@@ -224,6 +223,11 @@ main {
     width: 100%;
     height: calc(100vh - 160px);
     min-height: 600px;
+}
+
+body.embed main {
+    max-width: none;
+    padding: 0;
 }
 
 /* footer */
@@ -542,7 +546,7 @@ footer a {
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
 </head>
-<body>
+<body{% block body_class %}{% endblock %}>
     <header>
         <nav>
             <div class="nav-brand">
