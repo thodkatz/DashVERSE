@@ -12,8 +12,8 @@ logging.basicConfig(level=getattr(logging, settings.log_level))
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="DashVERSE Demo Portal",
-    description="Public demo portal for viewing embedded Superset dashboards",
+    title="DashVERSE",
+    description="Landing site for viewing embedded Superset dashboards",
     version="1.0.0",
     root_path=settings.root_path,
 )
