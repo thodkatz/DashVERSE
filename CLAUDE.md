@@ -113,7 +113,6 @@ bash scripts/vm/start.sh    # start VM + minikube + port-forward + SSH tunnels
 bash scripts/vm/stop.sh     # stop everything (add --vm to also shut down the VM)
 ```
 
-The SSH tunnels bind to the server's Tailscale IP so services are reachable from other machines on the tailnet. VM IP is discovered from `/var/lib/dnsmasq/dnsmasq.leases` (DHCP is NixOS-managed, not libvirt-managed).
 
 ## Key Docs
 

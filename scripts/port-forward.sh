@@ -18,7 +18,7 @@ trap cleanup SIGINT SIGTERM
 forward() {
     local svc=$1 local_port=$2 remote_port=$3
     while true; do
-        kubectl port-forward -n "$NS" "svc/$svc" "$local_port:$remote_port" 2>/dev/null || true
+        kubectl port-forward --address 0.0.0.0 -n "$NS" "svc/$svc" "$local_port:$remote_port" 2>/dev/null || true
         sleep 2
     done
 }
