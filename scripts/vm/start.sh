@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Run on the NixOS server.
-# Starts the DashVERSE VM, minikube, port-forward, and SSH tunnels.
+# Run on the host machine (NixOS or Ubuntu).
+# Starts the DashVERSE VM, minikube, port-forward, SSH tunnels, and ufw rules.
 #
 # Usage:
 #   bash scripts/vm/start.sh
@@ -81,7 +81,10 @@ else
     sleep 3
 fi
 
-# ── step 5: SSH tunnels on NixOS server ─────────────────────────────────────
+# ── step 5: open firewall ports (ufw) ───────────────────────────────────────
+bash "$(dirname "$0")/open-firewall.sh"
+
+# ── step 6: SSH tunnels ──────────────────────────────────────────────────────
 log "Opening SSH tunnels on $TAILSCALE_IP"
 
 # kill any stale tunnels to the VM first
