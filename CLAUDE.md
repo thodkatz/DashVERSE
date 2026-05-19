@@ -127,6 +127,8 @@ Two distinct data categories exist in the database. Do not confuse them.
 
 **Schema note:** `assessment_raw` and `software` have no foreign key relationship. `assessment_raw` stores everything as a JSONB blob. The tables are independent.
 
+**DB credentials:** The PostgreSQL user and database are both `dashverse` (not `postgres`). Use `-U dashverse -d dashverse` in any `psql` invocation.
+
 ### Clean deployment (no demo data)
 
 `scripts/vm/deploy-dashverse.sh` defaults to skipping seed data. Pass `--skip-seed` explicitly if you ever need to be certain, or just don't call `make seed-data` after deploy.

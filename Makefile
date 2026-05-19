@@ -74,7 +74,7 @@ seed-data:
 	./scripts/seed-data.sh $(NS) --apply
 
 clear-demo-data:
-	kubectl exec -n $(NS) deploy/postgresql -- psql -U postgres -d dashverse \
+	kubectl exec -n $(NS) deploy/postgresql -- psql -U dashverse -d dashverse \
 		-c "SET search_path TO api; TRUNCATE assessment_raw, software RESTART IDENTITY CASCADE;"
 
 open-firewall:
