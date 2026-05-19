@@ -51,7 +51,7 @@ generate_sql() {
 
         if [[ -n "$id" && -n "$name" ]]; then
             echo "INSERT INTO indicators (identifier, name, description, status, quality_dimension, contact, source)"
-            echo "VALUES ('$abbrev', '$name', '$desc', '$status', '$dim', '$contact'::jsonb, '$source'::jsonb)"
+            echo "VALUES ('$id', '$name', '$desc', '$status', '$dim', '$contact'::jsonb, '$source'::jsonb)"
             echo "ON CONFLICT (identifier) DO UPDATE SET"
             echo "  name = EXCLUDED.name,"
             echo "  description = EXCLUDED.description,"
