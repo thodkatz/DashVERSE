@@ -3,7 +3,11 @@
 # Clones DashVERSE, starts minikube, and deploys the full stack.
 #
 # Usage:
-#   bash deploy-dashverse.sh
+#   bash deploy-dashverse.sh [--skip-seed]
+#
+# Flags:
+#   --skip-seed      Skip loading TechRadar demo software/assessments (seed-data).
+#                    Use this for a clean deployment where you add your own repos.
 #
 # Environment overrides:
 #   REPO_URL         Git remote (default: GitHub EVERSE repo)
@@ -26,6 +30,14 @@ REPO_URL="${REPO_URL:-https://github.com/thodkatz/DashVERSE.git}"
 REPO_DIR="${REPO_DIR:-$HOME/DashVERSE}"
 MINIKUBE_CPUS="${MINIKUBE_CPUS:-4}"
 MINIKUBE_MEMORY="${MINIKUBE_MEMORY:-6g}"
+SKIP_SEED=true
+
+for arg in "$@"; do
+    case "$arg" in
+        --skip-seed) SKIP_SEED=true ;;
+        *) error "Unknown argument: $arg" ;;
+    esac
+done
 
 # ── preflight checks ─────────────────────────────────────────────────────────
 log "Checking prerequisites"
@@ -95,8 +107,12 @@ log "Pod status"
 make status
 
 # ── seed data ────────────────────────────────────────────────────────────────
-log "Seeding sample data (fetches from EVERSE TechRadar)"
-make seed-data
+if $SKIP_SEED; then
+    warn "Skipping demo seed data (--skip-seed passed). Add your own repos via the API or make seed-data."
+else
+    log "Seeding sample data (fetches from EVERSE TechRadar)"
+    make seed-data
+fi
 
 # ── sync EVERSE indicators ───────────────────────────────────────────────────
 log "Syncing EVERSE indicators"

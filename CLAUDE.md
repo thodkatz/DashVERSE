@@ -114,6 +114,29 @@ bash scripts/vm/stop.sh     # stop everything (add --vm to also shut down the VM
 ```
 
 
+## Demo Data vs Real Data
+
+Two distinct data categories exist in the database. Do not confuse them.
+
+**Demo data** (TechRadar samples -- not real assessments):
+- `software` table -- populated by `make seed-data` (fetches ~20 packages from EVERSE TechRadar) and previously by 4 hardcoded entries in `database/sql/data/003_software.sql` (now removed)
+- `assessment_raw` table -- populated by `make seed-data` with synthetic check results
+
+**Real reference data** (upstream EVERSE definitions):
+- `indicators` and `dimensions` tables -- populated by `make sync-apply`, which pulls from the real `EVERSE-ResearchSoftware/indicators` GitHub repo. Do not treat these as demo data.
+
+**Schema note:** `assessment_raw` and `software` have no foreign key relationship. `assessment_raw` stores everything as a JSONB blob. The tables are independent.
+
+### Clean deployment (no demo data)
+
+`scripts/vm/deploy-dashverse.sh` defaults to skipping seed data. Pass `--skip-seed` explicitly if you ever need to be certain, or just don't call `make seed-data` after deploy.
+
+To wipe demo data from an already-running cluster:
+
+```sh
+make clear-demo-data   # TRUNCATEs assessment_raw and software, leaves indicators/dimensions intact
+```
+
 ## Key Docs
 
 - [docs/README.dev.md](docs/README.dev.md) — deployment walkthrough

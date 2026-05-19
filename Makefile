@@ -1,4 +1,4 @@
-.PHONY: deploy destroy status port-forward logs logs-auth logs-demo clean sync sync-apply jwt build-auth build-demo setup-dashboards seed-data open-firewall
+.PHONY: deploy destroy status port-forward logs logs-auth logs-demo clean sync sync-apply jwt build-auth build-demo setup-dashboards seed-data clear-demo-data open-firewall
 
 ENV ?= local
 NS ?= dashverse
@@ -72,6 +72,10 @@ setup-dashboards:
 
 seed-data:
 	./scripts/seed-data.sh $(NS) --apply
+
+clear-demo-data:
+	kubectl exec -n $(NS) deploy/postgresql -- psql -U postgres -d dashverse \
+		-c "SET search_path TO api; TRUNCATE assessment_raw, software RESTART IDENTITY CASCADE;"
 
 open-firewall:
 	bash scripts/vm/open-firewall.sh
