@@ -159,6 +159,24 @@ WHERE NOT EXISTS (
 
 If rows are returned, re-run `make sync-apply` (the script now correctly uses `$id`).
 
+### Demo data and real assessments use different status formats
+Seed data (`make seed-data`) uses `"status": {"@id": "Pass"}` / `"status": {"@id": "Fail"}` in the assessment payload, which matched the original `LIKE '%Pass%'` view logic. Real resqui assessments always emit `schema:CompletedActionStatus` regardless of outcome — the actual result is in the `output` field. The views were fixed to use `output = 'true'` for pass detection, which works for real data but also still works for demo data (demo data sets `output` consistently too). Do not revert to status-based matching.
+
+### Superset chart changes require a full teardown to take effect
+All chart creation tasks in `ansible/roles/superset_config/tasks/charts.yml` have a `when: ... length == 0` guard that skips creation if a chart with the same name already exists. This means editing the Ansible chart config has no effect on a running instance. To apply chart changes, destroy and recreate everything from scratch:
+
+```bash
+make destroy ENV=local
+make deploy ENV=local
+make sync-apply
+make setup-dashboards ENV=local
+```
+
+Do not try to apply individual chart fixes via the Ansible playbook — the guard will silently skip them. Either edit charts directly in the Superset UI, or do a full redeploy.
+
+### `assessment_trends` never had `pass_rate` — fixed
+The `Pass Rate Trend`, `Pass Rate KPI`, `Check Pass Rate Gauge`, and related Superset charts all read `pass_rate` from `assessment_trends`. That column was missing from the view entirely — those charts were always empty regardless of data. The view was fixed to compute it via `output = 'true'`. After applying `006_create_views.sql`, refresh the `assessment_trends` dataset in Superset (**Datasets → assessment_trends → Edit → Sync columns from source**) so Superset picks up the new column.
+
 ### `indicators` table is not cleared by `make clear-demo-data`
 `clear-demo-data` only truncates `assessment_raw` and `software`. The `indicators` and `dimensions` tables survive. `make sync-apply` must be run at least once after a fresh deploy — it is not called automatically.
 
