@@ -139,6 +139,29 @@ To wipe demo data from an already-running cluster:
 make clear-demo-data   # TRUNCATEs assessment_raw and software, leaves indicators/dimensions intact
 ```
 
+## Known Gotchas
+
+### Dashboard views score everything as zero
+The views in `database/sql/schema/006_create_views.sql` originally matched pass/fail using `status LIKE '%Pass%'`. All resqui plugins emit `schema:CompletedActionStatus` as the status URI regardless of outcome — the actual result is in the `output` field (`"true"` / `"false"` / `"error"`). The views were fixed to use `check_item->>'output' = 'true'` for pass detection. If scores ever show as zero again, check that the views haven't regressed.
+
+### `indicators` table identifier must be the full IRI
+`scripts/import-everse.sh` populates the `indicators` table. The identifier column must store the full `@id` IRI (e.g. `https://w3id.org/everse/i/indicators/software_has_license`) because the dashboard views join on `check_item->'assessesIndicator'->>'@id' = i.identifier`. An earlier version used the short `.abbreviation` field, causing all joins to miss. If the dashboards show data in "recent assessments" but zero scores, run the unmatched-IRI diagnostic query:
+
+```sql
+SELECT DISTINCT check_item->'assessesIndicator'->>'@id' AS indicator_iri
+FROM assessment_raw
+CROSS JOIN LATERAL jsonb_array_elements(payload->'checks') AS check_item
+WHERE NOT EXISTS (
+  SELECT 1 FROM api.indicators i
+  WHERE i.identifier = check_item->'assessesIndicator'->>'@id'
+);
+```
+
+If rows are returned, re-run `make sync-apply` (the script now correctly uses `$id`).
+
+### `indicators` table is not cleared by `make clear-demo-data`
+`clear-demo-data` only truncates `assessment_raw` and `software`. The `indicators` and `dimensions` tables survive. `make sync-apply` must be run at least once after a fresh deploy — it is not called automatically.
+
 ## Key Docs
 
 - [docs/README.dev.md](docs/README.dev.md) — deployment walkthrough
