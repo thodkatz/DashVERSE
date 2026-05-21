@@ -22,7 +22,8 @@ ON CONFLICT (identifier) DO UPDATE SET
 -- indicators
 {% for r in indicator_files.results %}
 {%   set i = r.content | from_json %}
-{%   if i.abbreviation and i.name %}
+{%   set i_iri = i['@id'] | default('') %}
+{%   if i_iri and i.name %}
 {%     set name = i.name | replace("'", "''") %}
 {%     set desc = (i.description | default('')) | replace("'", "''") %}
 {%     set status = (i.status | default('Active')) | replace("'", "''") %}
@@ -30,7 +31,7 @@ ON CONFLICT (identifier) DO UPDATE SET
 {%     set contact = (i.contact | default({}) | to_json) | replace("'", "''") %}
 {%     set src = (i.source | default({}) | to_json) | replace("'", "''") %}
 INSERT INTO indicators (identifier, name, description, status, quality_dimension, contact, source)
-VALUES ('{{ i.abbreviation }}', '{{ name }}', '{{ desc }}', '{{ status }}', '{{ dim }}', '{{ contact }}'::jsonb, '{{ src }}'::jsonb)
+VALUES ('{{ i_iri }}', '{{ name }}', '{{ desc }}', '{{ status }}', '{{ dim }}', '{{ contact }}'::jsonb, '{{ src }}'::jsonb)
 ON CONFLICT (identifier) DO UPDATE SET
     name = EXCLUDED.name,
     description = EXCLUDED.description,
