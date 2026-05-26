@@ -125,8 +125,11 @@ SELECT
   date_trunc('month', (a.payload->>'dateCreated')::timestamp) AS month,
   COUNT(DISTINCT a.id) AS assessments,
   COUNT(DISTINCT a.payload->'assessedSoftware'->>'name') AS software_count,
-  AVG(jsonb_array_length(a.payload->'checks'))::numeric(10,2) AS avg_checks
+  (COUNT(check_item)::numeric / NULLIF(COUNT(DISTINCT a.id), 0))::numeric(10,2) AS avg_checks,
+  ROUND(100.0 * SUM(CASE WHEN check_item->>'output' = 'true' THEN 1 ELSE 0 END)
+    / NULLIF(COUNT(check_item), 0), 2) AS pass_rate
 FROM assessment_raw a
+LEFT JOIN LATERAL jsonb_array_elements(a.payload->'checks') AS check_item ON true
 GROUP BY date_trunc('month', (a.payload->>'dateCreated')::timestamp)
 ORDER BY month;
 

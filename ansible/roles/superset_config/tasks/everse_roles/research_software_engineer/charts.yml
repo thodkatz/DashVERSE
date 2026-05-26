@@ -188,10 +188,10 @@
       params: |
         {
           "x_axis": "month",
-          "metrics": [{"label": "assessments", "expressionType": "SIMPLE", "column": {"column_name": "assessments"}, "aggregate": "SUM"}],
+          "metrics": [{"label": "pass_rate", "expressionType": "SIMPLE", "column": {"column_name": "pass_rate"}, "aggregate": "AVG"}],
           "color_scheme": "supersetColors",
           "show_legend": true,
-          "y_axis_format": ".0f"
+          "y_axis_format": ".1f"
         }
     status_code: [200, 201]
   when: existing_charts.json.result | selectattr('slice_name', 'equalto', 'Pass Rate Trend') | list | length == 0
